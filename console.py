@@ -114,49 +114,33 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_create(self, args):
-        """Create a new instance of a class"""
-        # Split the argument into the class name and parameter list
-        args = args.split()
-        if len(args) < 1:
+        """ Create an object of any class"""
+        from models import storage
+        """Check if class name is provided in args"""
+        if not args:
             print("** class name missing **")
             return
-        class_name = args[0]
-        # Check if the specified class exists
-        if class_name not in self.classes:
+        """Split args into class name and params"""
+        args = args.partition(' ')
+        """Check if class exists in dict of classes"""
+        if args[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        # Create an empty dictionary to hold the parameters
-        params = {}
-        # Iterate over the parameters in the list
-        for param in args[1:]:
-            # Check if the parameter is in the correct format (key=value)
-            if "=" not in param:
-                continue
-            # Split the parameter into key and value
-            key, value = param.split("=")
-            # Check if the value is non-empty
-            if not value:
-                continue
-            # If the value is a string, remove the quotes and replace underscores with spaces
-            if value[0] == '"' and value[-1] == '"' and "\\" not in value[:-1]:
-                value = value[1:-1].replace('_', ' ')
-            else:
-                # If the value is not a string, try to convert it to a float or integer
-                try:
-                    if "." in value:
-                        value = float(value)
-                    else:
-                        value = int(value)
-                except ValueError:
-                    # If the value cannot be converted, skip this parameter
-                    continue
-            # Add the parameter to the dictionary
-            params[key] = value
-        new_instance = HBNBCommand.classes[class_name]()
-        storage.save()
-        new_instance.__dict__.update(params)
+        """Split params into list of key-value pairs"""
+        params = args[2].split(' ')
+        """Create new instance of class using default constructor"""
+        new_instance = HBNBCommand.classes[args[0]]()
+        """Create dict of keyword args to be set as attributes of instance"""
+        param_dict = {}
+        for param in params:
+            param = param.partition("=")
+            param_dict[param[0]] = param[2].replace('"', '').replace('_', ' ')
+        """Set attributes of instance using dict of keyword args"""
+        new_instance.__dict__.update(**param_dict)
+
+        storage.new(new_instance)
         print(new_instance.id)
-        storage.save()
+        new_instance.save()
 
         
 
@@ -231,13 +215,23 @@ class HBNBCommand(cmd.Cmd):
         print("Destroys an individual instance of a class")
         print("[Usage]: destroy <className> <objectId>\n")
 
-    def do_all(self, line):
+    def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
-        if not line:
-            objs = storage.all()
+        print_list = []
+
+        if args:
+            args = args.split(' ')[0]  # remove possible trailing args
+            if args not in HBNBCommand.classes:
+                print("** class doesn't exist **")
+                return
+            for k, v in storage._FileStorage__objects.items():
+                if k.split('.')[0] == args:
+                    print_list.append(str(v))
         else:
-            objs = storage.all(eval(line))
-        print([objs[key].__str__() for key in objs])
+            for k, v in storage._FileStorage__objects.items():
+                print_list.append(str(v))
+
+        print(print_list)
 
     def help_all(self):
         """ Help information for the all command """
