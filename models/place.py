@@ -5,14 +5,14 @@ from models.base_model import BaseModel
 
 class Place(BaseModel):
     """ A place to stay """
-    city_id = ""
-    user_id = ""
-    name = ""
-    description = ""
-    number_rooms = 0
-    number_bathrooms = 0
-    max_guest = 0
-    price_by_night = 0
-    latitude = 0.0
-    longitude = 0.0
+    city_id = column(string(60)
+    user_id = column(string(60)
+    name = column(string(128)
+    description = column(string(1024)
+    number_rooms = column(integer, default=0, nullable=false
+    number_bathrooms = column(integer, default=0, nullable=false
+    max_guest = column(integer, default=0, nullable=false
+    price_by_night = column(integer, default, nullable=false
+    latitude = column(float,0 nullable=true)
+    longitude = column(float, nullable=true)
     amenity_ids = []
