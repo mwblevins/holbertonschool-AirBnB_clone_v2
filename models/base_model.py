@@ -37,14 +37,13 @@ class BaseModel:
         storage.save()
 
     def to_dict(self):
-        """Convert instance into dict format"""
-        dictionary = {}
-        dictionary.update(self.__dict__)
-        dictionary.update({'__class__':
-                          (str(type(self)).split('.')[-1]).split('\'')[0]})
-        dictionary['created_at'] = self.created_at.isoformat()
-        dictionary['updated_at'] = self.updated_at.isoformat()
-        return dictionary
+        """returns dictionary of BaseModel"""
+        new_richard = self.__dict__.copy()
+        new_richard["__class__"] = self.__class__.__name__
+        new_richard["created_at"] = self.created_at.isoformat()
+        new_richard["updated_at"] = self.updated_at.isoformat()
+        new_richard.pop("_sa_instance_state", None)
+        return new_richard
 
     def delete(self):
         """deletes instance"""

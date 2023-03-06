@@ -112,32 +112,29 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
-        """ Create an object of any class"""
-        cls = args.partition(' ')[0]
-        if not cls:
+    def do_create(self, line):
+        """Usage: create <Class name> <param 1> <param 2> <param 3>..."""
+        if not line:
             print("** class name missing **")
             return
-        elif cls not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
-        param_string = args.partition(' ')[2]
-        param_dict = {}
-        while param_string:
-            param_strings = param_string.partition(' ')
-            curr_param = param_strings[0]
-            param_data = curr_param.partition('=')
-            try:
-                val = HBNBCommand.get_value(param_data[2])
-                param_dict[param_data[0]] = val
-            except TypeError:
-                pass
-            param_string = param_strings[2]
-        new_instance = HBNBCommand.classes[cls]()
-        storage.save()
-        new_instance.__dict__.update(param_dict)
-        print(new_instance.id)
-        storage.save()
+        args = line.split()
+        kwargs = {}
+        for param in range(1, len(args)):
+            ky, vl = args[param].split("=")
+            if vl[0] == '"':
+                vl = vl.replace('_', ' ').strip('"')
+            else:
+                try:
+                    vl = eval(vl)
+                except (SyntaxError, NameError):
+                    continue
+            kwargs[ky] = vl
+        if len(kwargs) == 0:
+            obj = eval(args[0])()
+        else:
+            obj = eval(args[0])(**kwargs)
+        print(obj.id)
+        obj.save()
 
     def help_create(self):
         """ Help information for the create method """
@@ -210,23 +207,13 @@ class HBNBCommand(cmd.Cmd):
         print("Destroys an individual instance of a class")
         print("[Usage]: destroy <className> <objectId>\n")
 
-    def do_all(self, args):
+    def do_all(self, line):
         """ Shows all objects, or all objects of a class"""
-        print_list = []
-
-        if args:
-            args = args.split(' ')[0]  # remove possible trailing args
-            if args not in HBNBCommand.classes:
-                print("** class doesn't exist **")
-                return
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
+        if not line:
+            objs = storage.all()
         else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
-
-        print(print_list)
+            objs = storage.all(eval(line))
+        print([objs[key].__str__() for key in objs])
 
     def help_all(self):
         """ Help information for the all command """
