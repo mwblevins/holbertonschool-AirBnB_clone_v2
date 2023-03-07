@@ -23,7 +23,7 @@ class BaseModel:
                     vl = datetime.strptime(vl, '%Y-%m-%dT%H:%M:%S.%f')
                 if ky != '__class__':
                     setattr(self, ky, vl)
-        
+
     def __str__(self):
         """Returns a string representation of the instance"""
         cls = (str(type(self)).split('.')[-1]).split('\'')[0]

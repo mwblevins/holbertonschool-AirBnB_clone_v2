@@ -5,7 +5,7 @@ from sqlalchemy import Culumn, String, ForeignKey
 
 
 class Review(BaseModel, Base):
-    """ 
+    """
     Review class for storing review information
     """
     __tablename__ = "reviews"
