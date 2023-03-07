@@ -4,6 +4,7 @@ from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, ForeignKey, Integer, Float, Table
 from sqlalchemy.orm import relationship
 from os import getenv
+from models.review import Review
 
 
 place_amenity = Table('place_amenity', Base.metadata,
@@ -31,3 +32,44 @@ class Place(BaseModel, Base):
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     amenity_ids = []
+    
+    storageType = getenv("HBNB_TYPE_STORAGE")
+    if storageType == "db":
+        reviews = relationship('Review',
+                               cascade="all, delete, delete-orphan",
+                               backref="place")
+        amenities = relationship("Amenity",
+                                 secondary=place_amenity,
+                                 back_populates='place_amenities',
+                                 viewonly=False)
+    else:
+        @property
+        def reviews(self):
+            """reviews storage type"""
+            from models import storage
+            rev = []
+            for x in storage.all(Review).values():
+                if x.place_id == self.id:
+                    rev.append(x)
+            return rev
+
+        @property
+        def amenities(self):
+            """getter"""
+            from models import storage
+            from models.amenity import Amenity
+            ame = []
+            moby = storage.all(Amenity)
+
+            for amenity_inst in moby.values():
+                if amenity_inst.id == self.amenity_id:
+                    ame.append(amenity_inst)
+            return ame
+
+        @amenities.setter
+        def amenities(self, amenity_list):
+            """setter"""
+            from models.amenity import Amenity
+            for x in amenity_list:
+                if type(x) == Amenity:
+                    self.amenity_ids.append(x)
