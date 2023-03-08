@@ -66,5 +66,5 @@ def reload(self):
             temp = json.load(f)
             for key, val in temp.items():
                 self.all()[key] = classes[val['__class__']](**val)
-        except FileNotFoundError:
-            pass
+    except FileNotFoundError:
+        pass
