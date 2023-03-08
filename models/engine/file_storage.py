@@ -44,7 +44,6 @@ class FileStorage:
             del FileStorage.__objects[key_val]
         self.save()
 
-
     def reload(self):
         """Loads storage dictionary from file"""
         from models.base_model import BaseModel
