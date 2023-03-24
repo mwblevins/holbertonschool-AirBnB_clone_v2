@@ -3,6 +3,7 @@
 
 from flask import Flask
 
+
 app = Flask(__name__)
 
 
@@ -25,7 +26,7 @@ def c(text):
 
 
 @app.route('/python', defaults={'text': 'is cool'}, strict_slashes=False)
-@app.route('python/<text>', methods=['GET'], strict_slashes=False)
+@app.route('/python/<text>', methods=['GET'], strict_slashes=False)
 def python(text):
     """Display 'Python' Followed by text"""
     return "Python {}".format(text.replace("_", " "))
