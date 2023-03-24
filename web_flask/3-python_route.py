@@ -23,7 +23,7 @@ def c(text):
 
 @app.route('/python', defaults={'text': 'is cool'}, methods=['GET'],
            strict_slashes=False)
-@app.route('python/<text', methods=['GET'], strict_slashes=False)
+@app.route('python/<text>', methods=['GET'], strict_slashes=False)
 def python(text):
     return "Python {}".format(text.replace("_", " "))
 
