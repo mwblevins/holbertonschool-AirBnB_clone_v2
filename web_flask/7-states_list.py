@@ -1,9 +1,8 @@
 #!/usr/bin/python3
 """Start Flask application for Holberton task 7"""
 
-from flask import Flask, render_template, current_app, g
 from models import storage
-from models.state import State
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
@@ -12,7 +11,7 @@ app = Flask(__name__)
 def states_list():
     """States list to display html page"""
     states = storage.all('State')
-    return render_template('states_list.html', states=states)
+    return render_template('7-states_list.html', states=states)
 
 
 @app.teardown_appcontext
