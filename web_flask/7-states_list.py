@@ -10,13 +10,14 @@ app = Flask(__name__)
 
 @app.route('/states_list', strict_slashes=False)
 def states_list():
-    states = storage.all(State).values()
-    states_sorted = sorted(states, key=lambda state: state.name)
-    return render_template('states_list.html', states=states_sorted)
+    """States list to display html page"""
+    states = storage.all('State')
+    return render_template('states_list.html', states=states)
 
 
 @app.teardown_appcontext
-def teardown_appcontext(exception):
+def teardown(exc):
+    """Remove current sqlalchemy session affter each request..."""
     storage.close()
 
 
